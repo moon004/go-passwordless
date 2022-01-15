@@ -51,7 +51,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create a context (required by CookieStore token store)
-	ctx := passwordless.SetContext(nil, w, r)
+	ctx := passwordless.SetContext(nil, w, r, "")
 
 	strategy := r.FormValue("strategy")
 	recipient := r.FormValue("recipient")

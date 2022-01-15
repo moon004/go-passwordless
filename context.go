@@ -9,18 +9,20 @@ import (
 type ctxKey int
 
 const (
-	reqKey ctxKey = 1
-	rwKey  ctxKey = 2
+	reqKey ctxKey = iota
+	rwKey
+	recKey
 )
 
 // SetContext returns a Context containing the specified `ResponseWriter` and
 // `Request`. If a nil Context is provided, a new one is returned.
-func SetContext(ctx context.Context, rw http.ResponseWriter, r *http.Request) context.Context {
+func SetContext(ctx context.Context, rw http.ResponseWriter, r *http.Request, recipient string) context.Context {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	ctx = context.WithValue(ctx, reqKey, r)
 	ctx = context.WithValue(ctx, rwKey, rw)
+	ctx = context.WithValue(ctx, recKey, recipient)
 	return ctx
 }
 

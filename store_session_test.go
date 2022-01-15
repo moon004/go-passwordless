@@ -54,14 +54,14 @@ func TestSessionStoreExists(t *testing.T) {
 
 	// Fail when attempting to Verify without valid cookie
 	req, err := http.NewRequest("", "", nil)
-	v, tm, err := cs.Exists(SetContext(nil, nil, req), "uid")
+	v, tm, err := cs.Exists(SetContext(nil, nil, req, ""), "uid")
 	assert.Error(t, err)
 	assert.False(t, v)
 	assert.Equal(t, time.Time{}, tm)
 
 	// Write token to cookie
 	rec := NewResponseRecorder()
-	ctx := SetContext(nil, rec, nil)
+	ctx := SetContext(nil, rec, nil, "")
 	err = cs.Store(ctx, "token", "uid", time.Hour)
 	assert.NoError(t, err)
 	assert.NotNil(t, rec.Header().Get("Set-Cookie"))
@@ -75,13 +75,13 @@ func TestSessionStoreExists(t *testing.T) {
 	}
 
 	// Check Exists
-	v, tm, err = cs.Exists(SetContext(nil, nil, req), "uid")
+	v, tm, err = cs.Exists(SetContext(nil, nil, req, ""), "uid")
 	assert.NoError(t, err)
 	assert.True(t, v)
 	assert.NotEqual(t, time.Time{}, tm)
 
 	// Check Exists fails for wrong uid
-	v, tm, err = cs.Exists(SetContext(nil, nil, req), "anotheruid")
+	v, tm, err = cs.Exists(SetContext(nil, nil, req, ""), "anotheruid")
 	assert.Equal(t, err, ErrWrongTokenUID)
 	assert.False(t, v)
 	assert.Equal(t, time.Time{}, tm)
@@ -89,7 +89,7 @@ func TestSessionStoreExists(t *testing.T) {
 	// Test bad cookie fails verification
 	req, err = http.NewRequest("", "", nil)
 	req.AddCookie(&http.Cookie{Name: "passwordless", Value: "invalid!"})
-	v, tm, err = cs.Exists(SetContext(nil, nil, req), "uid")
+	v, tm, err = cs.Exists(SetContext(nil, nil, req, ""), "uid")
 	assert.Error(t, err)
 	assert.False(t, v)
 	assert.Equal(t, time.Time{}, tm)
@@ -100,7 +100,7 @@ func TestSessionStoreVerify(t *testing.T) {
 
 	// Write token to cookie
 	rec := NewResponseRecorder()
-	ctx := SetContext(nil, rec, nil)
+	ctx := SetContext(nil, rec, nil, "")
 	err := cs.Store(ctx, "token", "uid", time.Hour)
 	assert.NoError(t, err)
 	assert.NotNil(t, rec.Header().Get("Set-Cookie"))
@@ -114,12 +114,12 @@ func TestSessionStoreVerify(t *testing.T) {
 	}
 
 	// Verify bad token fails
-	v, err := cs.Verify(SetContext(nil, nil, req), "badtoken", "uid")
+	v, err := cs.Verify(SetContext(nil, nil, req, ""), "badtoken", "uid")
 	assert.NoError(t, err)
 	assert.False(t, v)
 
 	// Verify good token succeeds
-	v, err = cs.Verify(SetContext(nil, nil, req), "token", "uid")
+	v, err = cs.Verify(SetContext(nil, nil, req, ""), "token", "uid")
 	assert.NoError(t, err)
 	assert.True(t, v)
 }
@@ -130,7 +130,7 @@ func TestSessionStoreDelete(t *testing.T) {
 	assert.Equal(t, ErrNoResponseWriter, err)
 
 	rec := NewResponseRecorder()
-	err = cs.Delete(SetContext(nil, rec, nil), "")
+	err = cs.Delete(SetContext(nil, rec, nil, ""), "")
 	assert.Nil(t, err)
 	assert.NotEmpty(t, rec.Header().Get("Set-Cookie"))
 }

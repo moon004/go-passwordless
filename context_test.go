@@ -5,8 +5,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"context"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type ctxTestKey int
@@ -16,14 +17,14 @@ const (
 )
 
 func TestContext(t *testing.T) {
-	assert.NotNil(t, SetContext(nil, nil, nil))
+	assert.NotNil(t, SetContext(nil, nil, nil, ""))
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, testKey, "hello")
 	rw := httptest.NewRecorder()
 	req := &http.Request{}
 
-	ctx = SetContext(ctx, rw, req)
+	ctx = SetContext(ctx, rw, req, "")
 
 	assert.NotNil(t, ctx)
 	rw2, req2 := fromContext(ctx)
